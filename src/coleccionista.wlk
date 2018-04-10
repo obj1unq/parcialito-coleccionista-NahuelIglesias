@@ -30,45 +30,64 @@
  * 
  * Punto 1) COLECCIONES: Hacer que el objeto coleccionista entienda los siguientes mensajes:
  * 
- * - agregarElemento(unElemento) -> agrega un elemento a la galería de elementos.
- * - quitarElemento(unElemento) -> elimina un elemento de la galería de elementos.
- * - objetosFragiles() -> devuelve todos los elementos de la galeria que son frágiles.
- * - objetoFragilMasCaro() -> devuelve el objeto frágil de mayor valor.
- * - valorEnObjetosFragiles() -> devuelve la suma de los valores de todos los objetos frágiles de la galería.
- * - valorEnCategoria(unaCategoria) -> devuelve la suma de los valores de todos los objetos de la galería que pertenecen a la categoría dada.
- * - existeElementoDe(unaCategoria) -> indica si en la galería existe algún elemento que pertenezca a la categoría dada.
- * - categorías() -> devuelve todas las categorías en las cuales el coleccionista posea al menos un elemento.
+ ** - agregarElemento(unElemento) -> agrega un elemento a la galería de elementos.
+ ** - quitarElemento(unElemento) -> elimina un elemento de la galería de elementos.
+ ** - objetosFragiles() -> devuelve todos los elementos de la galeria que son frágiles.
+ ** - objetoFragilMasCaro() -> devuelve el objeto frágil de mayor valor.
+ ** - valorEnObjetosFragiles() -> devuelve la suma de los valores de todos los objetos frágiles de la galería.
+ ** - valorEnCategoria(unaCategoria) -> devuelve la suma de los valores de todos los objetos de la galería que pertenecen a la categoría dada.
+ ** - existeElementoDe(unaCategoria) -> indica si en la galería existe algún elemento que pertenezca a la categoría dada.
+ ** - categorías() -> devuelve todas las categorías en las cuales el coleccionista posea al menos un elemento.
  * - todosValiosos() -> indica si la colección sólo posee elementos valiosos. Un elemento es considerado valioso para el coleccionista 
  *    si el valor supera $600
- * 
  * En el archivo 'coleccionista.wtest' están programados todos los test necesarios para probar los mensajes anteriores. 
  * Por supuesto, los test fallan actualmente. Debés agregar el código necesario para que los test den resultados positivos.
  * Se puede agregar nuevos test de considerarse necesario, pero para este examen alcanza con los provistos por los docentes.
- * 
- * Punto 2) POLIMORFIMSO: El dueño de la galería posee una guitarra eléctrica que quiere incorporar a su galería.
- * Como es un luthier experto, suele jugar a cambiar los micrófonos. También la guitarra se puede guardar en distintos estuches. 
- * - El valor de la guitarra electrica es de 10000 más el valor de los micrófonos. En principio el coleccionista tiene dos micrófonos distintos, 
- *   los gibson (que valen 1000) y los Di Marzio (que valen 800). El dueño planea comprar nuevos micrófonos, por lo que la solución debe 
- *   permitir hacer esto sencillamente
- * - La fragilidad de la guitarra depende del estuche donde se guarda: El estuche flexible hace que la guitarra sea frágil, mientras que el rígido no
- *   Podrían aparecer nuevos estuches en el futuro.
- * - La categoría de la guitarra eléctrica es música.
- * 
- * Para este punto no se proveen objetos preprogramados (salvo la definición del objeto guitarra eléctrica con una implementación vacía). 
- * Se provee además un archivo 'coleccionistaConGuitarra.wtest' que prueba que un coleccionista que tiene sólo una guitarra en su galería 
- * funcione bien. 
- * IMPORTANTE: La solución de este punto puede implicar la aparición de nuevos objetos! 
- * Nota: A efectos de este examen no es necesario agregar nuevos test. Pero es importante aclarar que, en un sistema real, las buenas prácticas
- * exigirían que todos los objetos estén testeados individualmente, y no solo a través de los test del coleccionista. 
- * 
- * 
-*/
+ */ 
+
 
 // PUNTO 1: COLECCIONES
 object coleccionista {
+	var galeria = #{}
 	
-	//TODO: Completar la implementacion de este objeto		
-
+	method agregarElemento(unElemento) {
+		galeria.add(unElemento)
+	}
+	
+	method quitarElemento(unElemento) {
+		galeria.remove(unElemento)
+	}
+	
+	method objetosFragiles() {
+		return galeria.filter({elemento => elemento.esFragil()})
+	}
+	
+	method objetoFragilMasCaro() {
+		return self.objetosFragiles().max({elemento => elemento.valor()})
+	}
+	
+	method valorEnObjetosFragiles() {
+		return self.objetosFragiles().sum({elemento => elemento.valor()})
+	}
+	
+	method valorEnCategoria(unaCategoria) {
+		return self.objetosDeCategoria(unaCategoria).sum({elemento => elemento.valor()})
+	}
+	method objetosDeCategoria(unaCategoria) {
+		return galeria.filter({elemento => elemento.categoria() == unaCategoria})
+	}
+	
+	method existeElementoDe(unaCategoria) {
+		return galeria.any({elemento => elemento.categoria() == unaCategoria})
+	}
+	
+	method categorias() {
+		return galeria.map({elemento => elemento.categoria()}).asSet()
+	}
+	
+	method todosValiosos() {
+		return galeria.all({elemento => elemento.valor() > 600})
+	}
 }
 
 
@@ -106,10 +125,58 @@ object musica {
 	
 }
 
+/* Punto 2) POLIMORFIMSO: El dueño de la galería posee una guitarra eléctrica que quiere incorporar a su galería.
+ * Como es un luthier experto, suele jugar a cambiar los micrófonos. También la guitarra se puede guardar en distintos estuches. 
+ * - El valor de la guitarra electrica es de 10000 más el valor de los micrófonos. En principio el coleccionista tiene dos micrófonos distintos, 
+ *   los gibson (que valen 1000) y los Di Marzio (que valen 800). El dueño planea comprar nuevos micrófonos, por lo que la solución debe 
+ *   permitir hacer esto sencillamente
+ * - La fragilidad de la guitarra depende del estuche donde se guarda: El estuche flexible hace que la guitarra sea frágil, mientras que el rígido no
+ *   Podrían aparecer nuevos estuches en el futuro.
+ * - La categoría de la guitarra eléctrica es música.
+ * 
+ * Para este punto no se proveen objetos preprogramados (salvo la definición del objeto guitarra eléctrica con una implementación vacía). 
+ * Se provee además un archivo 'coleccionistaConGuitarra.wtest' que prueba que un coleccionista que tiene sólo una guitarra en su galería 
+ * funcione bien. 
+ * IMPORTANTE: La solución de este punto puede implicar la aparición de nuevos objetos! 
+ * Nota: A efectos de este examen no es necesario agregar nuevos test. Pero es importante aclarar que, en un sistema real, las buenas prácticas
+ * exigirían que todos los objetos estén testeados individualmente, y no solo a través de los test del coleccionista. 
+ * 
+ * 
+*/
+
 // PUNTO 2: POLIMORFISMO. 
 object guitarraElectrica {
-   //TODO Completar la implementacion de este objeto
+	var microfono = gibson
+	var estuche = flexible
+	
+	method cambiarMicrofono(mic) {
+		microfono = mic
+	}
+	method cambiarEstuche(_estuche) {
+		estuche = _estuche
+	}
+	
+	method esFragil() = estuche.esFragil()
+	method valor() = 10000 + microfono.valorMic()
+	method categoria() = musica
 }
 
-//TODO: agregar los objetos que falten! Si no agregaste ninguno repensá tu solución; pista: el punto se llama "POLIMORFISMO" 
+//---Microfonos---
 
+object gibson {
+	method valorMic() = 1000
+}
+
+object diMarzio {
+	method valorMic() = 800
+}
+
+//---Estuches---
+
+object flexible {
+	method esFragil() = true
+}
+
+object rigido {
+	method esFragil() = false
+}
